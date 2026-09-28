@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#07111d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<title>Seal Beach Weather Station</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--bg:#07111d;--card:#0e1d2c;--card2:#13263a;--text:#f4f8fb;--muted:#9fb3c7;--line:#263b50;--accent:#55b8ff}
+*{box-sizing:border-box} html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+#app{height:100vh;padding:10px;display:grid;grid-template-rows:82px minmax(285px,1fr) 116px 78px 52px;gap:8px}
+header{display:grid;grid-template-columns:1.15fr 1fr 1.25fr;align-items:center;background:var(--card);border-radius:16px;padding:10px 18px}
+.time{font-size:42px;font-weight:750;line-height:1}.date{font-size:15px;color:var(--muted);margin-top:7px}.place{text-align:center;font-size:23px;font-weight:700}.status{text-align:right}.bigtemp{font-size:46px;font-weight:750;line-height:1}.cond{font-size:17px;color:var(--muted);margin-top:4px}
+main{display:grid;grid-template-columns:1.55fr .75fr;gap:8px;min-height:0}
+.mapcard,.conditions,.hours,.days{background:var(--card);border-radius:16px;overflow:hidden}
+.mapcard{position:relative}.maptitle{position:absolute;z-index:500;top:10px;left:10px;background:#07111ddd;padding:7px 11px;border-radius:9px;font-weight:700;font-size:14px}.mapage{position:absolute;z-index:500;bottom:8px;left:10px;background:#07111ddd;padding:5px 9px;border-radius:8px;font-size:12px}.radarplay{position:absolute;z-index:600;right:10px;bottom:8px;width:auto;height:auto;padding:6px 10px;border:1px solid #49677f;background:#07111ddd;color:#fff;border-radius:8px;font-size:12px;font-weight:800}
+#radar,#windy{width:100%;height:100%}#windy{border:0;display:none}
+.conditions{padding:14px;display:grid;grid-template-rows:auto 1fr auto}.conditions h2{font-size:17px;margin:0 0 10px;color:var(--muted);letter-spacing:.06em}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;align-content:center}.metric{background:var(--card2);border-radius:10px;padding:7px 9px}.metric b{display:block;font-size:20px}.metric span{font-size:12px;color:var(--muted)}.updated{font-size:12px;color:var(--muted);margin-top:8px}
+.hours{padding:7px 10px}.hoursrow{height:100%;display:grid;grid-template-columns:repeat(8,1fr);gap:6px}.hour{text-align:center;border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:center}.hour:last-child{border:0}.hour .t{font-size:13px;color:var(--muted)}.hour .ico{font-size:24px;margin:4px}.hour .temp{font-size:20px;font-weight:700}.hour .rain{font-size:11px;color:#7fcaff;margin-top:3px}
+.days{display:block;padding:6px 10px}
+.daysrow{height:100%;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.day{text-align:center;border-right:1px solid var(--line);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 8px}
+.day:last-child{border:0}.day .dn{font-size:13px;color:var(--muted);font-weight:700}.day .di{font-size:23px}.day .hi{font-size:18px;font-weight:750}.day .lo{font-size:13px;color:var(--muted)}
+nav{background:var(--card);border-radius:16px;padding:6px;display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+button{border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:10px;font-size:14px;font-weight:700}button.active{background:#17466a;border-color:#3d9ddd}
+.leaflet-control-attribution{font-size:9px!important}
+@media(max-width:900px){#app{padding:6px;gap:5px;grid-template-rows:70px minmax(245px,1fr) 104px 68px 46px}}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <div><div class="time" id="clock">--:--</div><div class="date" id="date"></div></div>
+  <div class="place">SEAL BEACH</div>
+  <div class="status"><span class="bigtemp" id="bigtemp">--°</span><div class="cond" id="condition">Loading weather…</div></div>
+</header>
+
+<main>
+ <section class="mapcard">
+   <div class="maptitle" id="maptitle">LIVE PRECIPITATION RADAR</div>
+   <div class="mapage" id="mapage">Loading latest radar…</div>
+   <button class="radarplay" id="radarplay" title="Play recent precipitation">▶ PLAY</button>
+   <div id="radar"></div>
+   <iframe id="windy" allowfullscreen></iframe>
+ </section>
+ <section class="conditions">
+   <h2>CURRENT CONDITIONS</h2>
+   <div class="metrics">
+     <div class="metric"><b id="rh">--%</b><span>Humidity</span></div>
+     <div class="metric"><b id="feels">--°</b><span>Feels like</span></div>
+     <div class="metric"><b id="wind">-- mph</b><span>Wind</span></div>
+     <div class="metric"><b id="dew">--°</b><span>Dew point</span></div>
+     <div class="metric"><b id="pressure">--</b><span>Pressure inHg</span></div>
+     <div class="metric"><b id="cloud">--%</b><span>Cloud cover</span></div>
+   </div>
+   <div class="updated" id="updated"></div>
+ </section>
+</main>
+
+<section class="hours"><div class="hoursrow" id="hoursrow"></div></section>
+<section class="days"><div class="daysrow" id="daysrow"></div></section>
+<nav>
+ <button class="active" data-layer="radar">RADAR</button>
+ <button data-layer="satellite">SATELLITE</button>
+ <button data-layer="clouds">CLOUDS</button>
+ <button data-layer="wind">WIND</button>
+ <button data-layer="temp">TEMPERATURE</button>
+</nav>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const LAT=33.765, LON=-118.078;
+const $=id=>document.getElementById(id);
+const map=L.map('radar',{zoomControl:true,attributionControl:true}).setView([LAT,LON],9);
+L.tileLayer('https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=cb1_40zx_1_aa2247d6a49ed456802e1a31',{
+ maxZoom:20,
+ attribution:'© OpenStreetMap contributors © CARTO'
+}).addTo(map);
+L.circleMarker([LAT,LON],{radius:6,color:'#fff',weight:2,fillColor:'#38a8ff',fillOpacity:1}).addTo(map).bindTooltip('Home area');
+let radarLayer=null, radarFrames=[], radarIndex=0, radarTimer=null;
+
+function clock(){
+ const d=new Date();
+ $('clock').textContent=d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+ $('date').textContent=d.toLocaleDateString([], {weekday:'short',month:'short',day:'numeric',year:'numeric'});
+}
+clock(); setInterval(clock,1000);
+
+const codeText={0:'Clear',1:'Mostly clear',2:'Partly cloudy',3:'Overcast',45:'Fog',48:'Fog',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',71:'Light snow',73:'Snow',75:'Heavy snow',80:'Rain showers',81:'Rain showers',82:'Heavy showers',95:'Thunderstorms',96:'Thunderstorms',99:'Thunderstorms'};
+function icon(c,isday=1){
+ if(c===0)return isday?'☀️':'🌙'; if(c<=2)return isday?'🌤️':'☁️'; if(c===3)return'☁️'; if(c===45||c===48)return'🌫️';
+ if([51,53,55,61,63,65,80,81,82].includes(c))return'🌧️'; if([71,73,75].includes(c))return'🌨️'; if(c>=95)return'⛈️'; return'☁️';
+}
+function dewpointF(tf,rh){
+ const c=(tf-32)*5/9, a=17.625,b=243.04,g=Math.log(rh/100)+(a*c)/(b+c), dc=(b*g)/(a-g); return dc*9/5+32;
+}
+async function weather(){
+ try{
+ const vars='temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m';
+ const hourly='temperature_2m,precipitation_probability,weather_code,is_day';
+ const daily='weather_code,temperature_2m_max,temperature_2m_min';
+ const url=`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=${vars}&hourly=${hourly}&daily=${daily}&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FLos_Angeles&forecast_days=3`;
+ const r=await fetch(url); const d=await r.json(), c=d.current;
+ $('bigtemp').textContent=Math.round(c.temperature_2m)+'°';
+ $('condition').textContent=icon(c.weather_code,c.is_day)+' '+(codeText[c.weather_code]||'Current conditions');
+ $('rh').textContent=Math.round(c.relative_humidity_2m)+'%';
+ $('feels').textContent=Math.round(c.apparent_temperature)+'°';
+ $('wind').textContent=Math.round(c.wind_speed_10m)+' mph';
+ $('dew').textContent=Math.round(dewpointF(c.temperature_2m,c.relative_humidity_2m))+'°';
+ $('pressure').textContent=(c.pressure_msl*0.0295299830714).toFixed(2);
+ $('cloud').textContent=Math.round(c.cloud_cover)+'%';
+ $('updated').textContent='Weather updated '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+' • Open-Meteo';
+ const now=new Date(); let start=d.hourly.time.findIndex(t=>new Date(t)>=new Date(now.getFullYear(),now.getMonth(),now.getDate(),now.getHours()));
+ if(start<0)start=0; const box=$('hoursrow'); box.innerHTML='';
+ for(let j=0;j<8;j++){let i=start+j; let dt=new Date(d.hourly.time[i]); let el=document.createElement('div');el.className='hour';
+ el.innerHTML=`<div class="t">${j===0?'NOW':dt.toLocaleTimeString([],{hour:'numeric'})}</div><div class="ico">${icon(d.hourly.weather_code[i],d.hourly.is_day[i])}</div><div class="temp">${Math.round(d.hourly.temperature_2m[i])}°</div><div class="rain">${d.hourly.precipitation_probability[i]}% rain</div>`;box.appendChild(el);}
+ const db=$('daysrow'); db.innerHTML='';
+ for(let i=0;i<Math.min(5,d.daily.time.length);i++){
+   const dt=new Date(d.daily.time[i]+'T12:00:00');
+   const el=document.createElement('div'); el.className='day';
+   el.innerHTML=`<div><div class="dn">${i===0?'TODAY':dt.toLocaleDateString([],{weekday:'short'}).toUpperCase()}</div><div class="lo">${Math.round(d.daily.temperature_2m_min[i])}° low</div></div><div class="di">${icon(d.daily.weather_code[i],1)}</div><div><div class="hi">${Math.round(d.daily.temperature_2m_max[i])}°</div><div class="lo">high</div></div>`;
+   db.appendChild(el);
+ }
+ }catch(e){$('condition').textContent='Weather connection error';}
+}
+weather(); setInterval(weather,10*60*1000);
+
+let radarHost='', radarPlaying=false;
+async function loadRadar(){
+ try{
+  const r=await fetch('https://api.rainviewer.com/public/weather-maps.json');
+  const d=await r.json();
+  radarFrames=d.radar.past.slice(-7);
+  radarHost=d.host;
+  if(!radarFrames.length)return;
+  if(!radarPlaying){
+    radarIndex=radarFrames.length-1;
+    showRadarFrame(radarIndex,radarHost);
+  }
+ }catch(e){$('mapage').textContent='Radar temporarily unavailable';}
+}
+function stopRadarPlayback(){
+ radarPlaying=false;
+ if(radarTimer){clearInterval(radarTimer);radarTimer=null;}
+ if(radarFrames.length){
+   radarIndex=radarFrames.length-1;
+   showRadarFrame(radarIndex,radarHost);
+ }
+ $('radarplay').textContent='▶ PLAY';
+}
+function playRadar(){
+ if(radarPlaying){stopRadarPlayback();return;}
+ if(radarFrames.length<2)return;
+ radarPlaying=true;
+ $('radarplay').textContent='■ STOP';
+ radarIndex=0;
+ showRadarFrame(radarIndex,radarHost);
+ if(radarTimer)clearInterval(radarTimer);
+ radarTimer=setInterval(()=>{
+   radarIndex++;
+   if(radarIndex>=radarFrames.length){
+     stopRadarPlayback();
+     return;
+   }
+   showRadarFrame(radarIndex,radarHost);
+ },1100);
+}
+$('radarplay').addEventListener('click',playRadar);
+function showRadarFrame(i,host){
+ if(radarLayer)map.removeLayer(radarLayer);
+ const f=radarFrames[i];
+ radarLayer=L.tileLayer(`${host}${f.path}/256/{z}/{x}/{y}/4/1_1.png`,{
+   opacity:.72,
+   zIndex:10,
+   maxNativeZoom:7,
+   maxZoom:20,
+   attribution:'Radar © RainViewer'
+  });
+ radarLayer.addTo(map);
+ const dt=new Date(f.time*1000);
+ $('mapage').textContent='Radar '+dt.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+' • RainViewer';
+}
+loadRadar(); setInterval(loadRadar,5*60*1000);
+
+const windy=$('windy'), radar=$('radar');
+function windyURL(layer){
+ let overlay={satellite:'satellite',clouds:'clouds',wind:'wind',temp:'temp'}[layer];
+ return `https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=%C2%B0F&metricWind=mph&zoom=7&overlay=${overlay}&product=gfs&level=surface&lat=${LAT}&lon=${LON}&message=true`;
+}
+document.querySelectorAll('button[data-layer]').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+ const layer=b.dataset.layer;
+ if(layer==='radar'){
+  windy.style.display='none';radar.style.display='block';$('maptitle').textContent='LIVE PRECIPITATION RADAR';$('mapage').style.display='block';$('radarplay').style.display='block';setTimeout(()=>map.invalidateSize(),100);
+ }else{
+  radar.style.display='none';windy.style.display='block';windy.src=windyURL(layer);
+  stopRadarPlayback();$('maptitle').textContent=layer.toUpperCase()+' MAP';$('mapage').style.display='none';$('radarplay').style.display='none';
+ }
+ localStorage.setItem('weatherLayer',layer);
+});
+const saved=localStorage.getItem('weatherLayer'); if(saved && saved!=='radar'){document.querySelector(`button[data-layer="${saved}"]`).click();}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+</script>
+</body></html>
