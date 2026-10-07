@@ -16,7 +16,7 @@
 *{box-sizing:border-box} html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
 #app{height:100vh;padding:10px;display:grid;grid-template-rows:82px minmax(285px,1fr) 116px 78px 52px;gap:8px}
 header{display:grid;grid-template-columns:1.15fr 1fr 1.25fr;align-items:center;background:var(--card);border-radius:16px;padding:10px 18px}
-.time{font-size:42px;font-weight:750;line-height:1}.date{font-size:15px;color:var(--muted);margin-top:7px}.place{text-align:center;font-size:23px;font-weight:700}.status{text-align:right}.bigtemp{font-size:46px;font-weight:750;line-height:1}.cond{font-size:17px;color:var(--muted);margin-top:4px}
+.time{font-size:42px;font-weight:750;line-height:1}.date{font-size:15px;color:var(--muted);margin-top:7px}.place{text-align:center;font-size:23px;font-weight:700}.status{text-align:right}.tempPair{display:flex;justify-content:flex-end;gap:22px;align-items:flex-end}.tempBlock{text-align:center}.tempValue{font-size:48px;font-weight:780;line-height:.95}.tempLabel{font-size:10px;color:var(--muted);font-weight:750;letter-spacing:.08em;margin-top:4px}.cond{font-size:19px;color:var(--muted);margin-top:4px}.condIcon{font-size:25px;vertical-align:-2px;margin-right:5px}
 main{display:grid;grid-template-columns:1.55fr .75fr;gap:8px;min-height:0}
 .mapcard,.conditions,.hours,.days{background:var(--card);border-radius:16px;overflow:hidden}
 .mapcard{position:relative}.maptitle{position:absolute;z-index:500;top:10px;left:10px;background:#07111ddd;padding:7px 11px;border-radius:9px;font-weight:700;font-size:14px}.mapage{position:absolute;z-index:500;bottom:8px;left:10px;background:#07111ddd;padding:5px 9px;border-radius:8px;font-size:12px}.radarplay{position:absolute;z-index:600;right:10px;bottom:8px;width:auto;height:auto;padding:6px 10px;border:1px solid #49677f;background:#07111ddd;color:#fff;border-radius:8px;font-size:12px;font-weight:800}
@@ -24,11 +24,11 @@ main{display:grid;grid-template-columns:1.55fr .75fr;gap:8px;min-height:0}
 .conditions{padding:14px;display:grid;grid-template-rows:auto 1fr auto}.conditions h2{font-size:17px;margin:0 0 10px;color:var(--muted);letter-spacing:.06em}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;align-content:center}.metric{background:var(--card2);border-radius:10px;padding:7px 9px}.metric b{display:block;font-size:20px}.metric span{font-size:12px;color:var(--muted)}.updated{font-size:12px;color:var(--muted);margin-top:8px}
 .hours{padding:7px 10px}.hoursrow{height:100%;display:grid;grid-template-columns:repeat(8,1fr);gap:6px}.hour{text-align:center;border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:center}.hour:last-child{border:0}.hour .t{font-size:13px;color:var(--muted)}.hour .ico{font-size:24px;margin:4px}.hour .temp{font-size:20px;font-weight:700}.hour .rain{font-size:11px;color:#7fcaff;margin-top:3px}
 .days{display:block;padding:6px 10px}
-.daysrow{height:100%;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.day{text-align:center;border-right:1px solid var(--line);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 8px}
+.daysrow{height:100%;display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.day{text-align:center;border-right:1px solid var(--line);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 4px}
 .day:last-child{border:0}.day .dn{font-size:13px;color:var(--muted);font-weight:700}.day .di{font-size:23px}.day .hi{font-size:18px;font-weight:750}.day .lo{font-size:13px;color:var(--muted)}
-nav{background:var(--card);border-radius:16px;padding:6px;display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
-button{border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:10px;font-size:14px;font-weight:700}button.active{background:#17466a;border-color:#3d9ddd}
+nav{background:var(--card);border-radius:16px;padding:6px;display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+button{border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:10px;font-size:12px;font-weight:700}button.active{background:#17466a;border-color:#3d9ddd}
 .leaflet-control-attribution{font-size:9px!important}
 @media(max-width:900px){#app{padding:6px;gap:5px;grid-template-rows:70px minmax(245px,1fr) 104px 68px 46px}}
 </style>
@@ -38,7 +38,13 @@ button{border:1px solid var(--line);background:var(--card2);color:var(--text);bo
 <header>
   <div><div class="time" id="clock">--:--</div><div class="date" id="date"></div></div>
   <div class="place">SEAL BEACH</div>
-  <div class="status"><span class="bigtemp" id="bigtemp">--°</span><div class="cond" id="condition">Loading weather…</div></div>
+  <div class="status">
+    <div class="tempPair">
+      <div class="tempBlock"><div class="tempValue" id="bigtemp">--°</div><div class="tempLabel">CURRENT</div></div>
+      <div class="tempBlock"><div class="tempValue" id="feels">--°</div><div class="tempLabel">FEELS LIKE</div></div>
+    </div>
+    <div class="cond" id="condition">Loading weather…</div>
+  </div>
 </header>
 
 <main>
@@ -53,10 +59,8 @@ button{border:1px solid var(--line);background:var(--card2);color:var(--text);bo
    <h2>CURRENT CONDITIONS</h2>
    <div class="metrics">
      <div class="metric"><b id="rh">--%</b><span>Humidity</span></div>
-     <div class="metric"><b id="feels">--°</b><span>Feels like</span></div>
      <div class="metric"><b id="wind">-- mph</b><span>Wind</span></div>
      <div class="metric"><b id="dew">--°</b><span>Dew point</span></div>
-     <div class="metric"><b id="pressure">--</b><span>Pressure inHg</span></div>
      <div class="metric"><b id="cloud">--%</b><span>Cloud cover</span></div>
    </div>
    <div class="updated" id="updated"></div>
@@ -68,9 +72,11 @@ button{border:1px solid var(--line);background:var(--card2);color:var(--text);bo
 <nav>
  <button class="active" data-layer="radar">RADAR</button>
  <button data-layer="satellite">SATELLITE</button>
- <button data-layer="clouds">CLOUDS</button>
+ <button data-layer="rain">RAIN/THUNDER</button>
  <button data-layer="wind">WIND</button>
  <button data-layer="temp">TEMPERATURE</button>
+ <button data-layer="waves">WAVES</button>
+ <button data-layer="airquality">AIR QUALITY</button>
 </nav>
 </div>
 
@@ -103,18 +109,17 @@ function dewpointF(tf,rh){
 }
 async function weather(){
  try{
- const vars='temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m';
+ const vars='temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m';
  const hourly='temperature_2m,precipitation_probability,weather_code,is_day';
  const daily='weather_code,temperature_2m_max,temperature_2m_min';
- const url=`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=${vars}&hourly=${hourly}&daily=${daily}&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FLos_Angeles&forecast_days=3`;
+ const url=`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=${vars}&hourly=${hourly}&daily=${daily}&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FLos_Angeles&forecast_days=7`;
  const r=await fetch(url); const d=await r.json(), c=d.current;
  $('bigtemp').textContent=Math.round(c.temperature_2m)+'°';
- $('condition').textContent=icon(c.weather_code,c.is_day)+' '+(codeText[c.weather_code]||'Current conditions');
+ $('condition').innerHTML='<span class="condIcon">'+icon(c.weather_code,c.is_day)+'</span>'+(codeText[c.weather_code]||'Current conditions');
  $('rh').textContent=Math.round(c.relative_humidity_2m)+'%';
  $('feels').textContent=Math.round(c.apparent_temperature)+'°';
  $('wind').textContent=Math.round(c.wind_speed_10m)+' mph';
  $('dew').textContent=Math.round(dewpointF(c.temperature_2m,c.relative_humidity_2m))+'°';
- $('pressure').textContent=(c.pressure_msl*0.0295299830714).toFixed(2);
  $('cloud').textContent=Math.round(c.cloud_cover)+'%';
  $('updated').textContent='Weather updated '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+' • Open-Meteo';
  const now=new Date(); let start=d.hourly.time.findIndex(t=>new Date(t)>=new Date(now.getFullYear(),now.getMonth(),now.getDate(),now.getHours()));
@@ -122,7 +127,7 @@ async function weather(){
  for(let j=0;j<8;j++){let i=start+j; let dt=new Date(d.hourly.time[i]); let el=document.createElement('div');el.className='hour';
  el.innerHTML=`<div class="t">${j===0?'NOW':dt.toLocaleTimeString([],{hour:'numeric'})}</div><div class="ico">${icon(d.hourly.weather_code[i],d.hourly.is_day[i])}</div><div class="temp">${Math.round(d.hourly.temperature_2m[i])}°</div><div class="rain">${d.hourly.precipitation_probability[i]}% rain</div>`;box.appendChild(el);}
  const db=$('daysrow'); db.innerHTML='';
- for(let i=0;i<Math.min(5,d.daily.time.length);i++){
+ for(let i=0;i<Math.min(7,d.daily.time.length);i++){
    const dt=new Date(d.daily.time[i]+'T12:00:00');
    const el=document.createElement('div'); el.className='day';
    el.innerHTML=`<div><div class="dn">${i===0?'TODAY':dt.toLocaleDateString([],{weekday:'short'}).toUpperCase()}</div><div class="lo">${Math.round(d.daily.temperature_2m_min[i])}° low</div></div><div class="di">${icon(d.daily.weather_code[i],1)}</div><div><div class="hi">${Math.round(d.daily.temperature_2m_max[i])}°</div><div class="lo">high</div></div>`;
@@ -191,8 +196,18 @@ loadRadar(); setInterval(loadRadar,5*60*1000);
 
 const windy=$('windy'), radar=$('radar');
 function windyURL(layer){
- let overlay={satellite:'satellite',clouds:'clouds',wind:'wind',temp:'temp'}[layer];
- return `https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=%C2%B0F&metricWind=mph&zoom=7&overlay=${overlay}&product=gfs&level=surface&lat=${LAT}&lon=${LON}&message=true`;
+ const cfg={
+   satellite:{overlay:'satellite',product:'satellite'},
+   rain:{overlay:'rain',product:'gfs'},
+   wind:{overlay:'wind',product:'gfs'},
+   temp:{overlay:'temp',product:'gfs'},
+   waves:{overlay:'waves',product:'ecmwfWaves'},
+   airquality:{overlay:'pm2p5',product:'cams'}
+ }[layer] || {overlay:'wind',product:'gfs'};
+ return `https://embed.windy.com/embed2.html?lat=${LAT}&lon=${LON}&zoom=7&level=surface&overlay=${cfg.overlay}&product=${cfg.product}&menu=&message=true&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=mph&metricTemp=%C2%B0F&metricRain=in&radarRange=-1`;
+}
+function mapTitle(layer){
+ return {satellite:'SATELLITE MAP',rain:'RAIN / THUNDER MAP',wind:'WIND MAP',temp:'TEMPERATURE MAP',waves:'WAVES MAP',airquality:'AIR QUALITY (PM2.5) MAP'}[layer] || layer.toUpperCase()+' MAP';
 }
 document.querySelectorAll('button[data-layer]').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active');
@@ -201,15 +216,13 @@ document.querySelectorAll('button[data-layer]').forEach(b=>b.onclick=()=>{
   windy.style.display='none';radar.style.display='block';$('maptitle').textContent='LIVE PRECIPITATION RADAR';$('mapage').style.display='block';$('radarplay').style.display='block';setTimeout(()=>map.invalidateSize(),100);
  }else{
   radar.style.display='none';windy.style.display='block';windy.src=windyURL(layer);
-  stopRadarPlayback();$('maptitle').textContent=layer.toUpperCase()+' MAP';$('mapage').style.display='none';$('radarplay').style.display='none';
+  stopRadarPlayback();$('maptitle').textContent=mapTitle(layer);$('mapage').style.display='none';$('radarplay').style.display='none';
  }
  localStorage.setItem('weatherLayer',layer);
 });
-const saved=localStorage.getItem('weatherLayer'); if(saved && saved!=='radar'){document.querySelector(`button[data-layer="${saved}"]`).click();}
+const saved=localStorage.getItem('weatherLayer'); const savedBtn=saved?document.querySelector(`button[data-layer="${saved}"]`):null; if(savedBtn && saved!=='radar'){savedBtn.click();}
 </script>
 <script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
-}
+if ('serviceWorker' in navigator) { window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{})); }
 </script>
 </body></html>
