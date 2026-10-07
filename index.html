@@ -15,13 +15,13 @@
 :root{--bg:#07111d;--card:#0e1d2c;--card2:#13263a;--text:#f4f8fb;--muted:#9fb3c7;--line:#263b50;--accent:#55b8ff}
 *{box-sizing:border-box} html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
 #app{height:100vh;padding:10px;display:grid;grid-template-rows:82px minmax(285px,1fr) 116px 78px 52px;gap:8px}
-header{display:grid;grid-template-columns:1.15fr 1fr 1.25fr;align-items:center;background:var(--card);border-radius:16px;padding:10px 18px}
-.time{font-size:42px;font-weight:750;line-height:1}.date{font-size:15px;color:var(--muted);margin-top:7px}.place{text-align:center;font-size:23px;font-weight:700}.status{text-align:right}.tempPair{display:flex;justify-content:flex-end;gap:22px;align-items:flex-end}.tempBlock{text-align:center}.tempValue{font-size:48px;font-weight:780;line-height:.95}.tempLabel{font-size:10px;color:var(--muted);font-weight:750;letter-spacing:.08em;margin-top:4px}.cond{font-size:19px;color:var(--muted);margin-top:4px}.condIcon{font-size:25px;vertical-align:-2px;margin-right:5px}
+header{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;background:var(--card);border-radius:16px;padding:10px 18px}
+.time{font-size:42px;font-weight:750;line-height:1}.date{font-size:15px;color:var(--muted);margin-top:7px}.place{text-align:center;font-size:23px;font-weight:700}.headerStatus{text-align:right;font-size:12px;color:var(--muted)}.headerStatus::before{content:'●';color:#31c878;margin-right:7px}
 main{display:grid;grid-template-columns:1.55fr .75fr;gap:8px;min-height:0}
 .mapcard,.conditions,.hours,.days{background:var(--card);border-radius:16px;overflow:hidden}
 .mapcard{position:relative}.maptitle{position:absolute;z-index:500;top:10px;left:10px;background:#07111ddd;padding:7px 11px;border-radius:9px;font-weight:700;font-size:14px}.mapage{position:absolute;z-index:500;bottom:8px;left:10px;background:#07111ddd;padding:5px 9px;border-radius:8px;font-size:12px}.radarplay{position:absolute;z-index:600;right:10px;bottom:8px;width:auto;height:auto;padding:6px 10px;border:1px solid #49677f;background:#07111ddd;color:#fff;border-radius:8px;font-size:12px;font-weight:800}
 #radar,#windy{width:100%;height:100%}#windy{border:0;display:none}
-.conditions{padding:14px;display:grid;grid-template-rows:auto 1fr auto}.conditions h2{font-size:17px;margin:0 0 10px;color:var(--muted);letter-spacing:.06em}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;align-content:center}.metric{background:var(--card2);border-radius:10px;padding:7px 9px}.metric b{display:block;font-size:20px}.metric span{font-size:12px;color:var(--muted)}.updated{font-size:12px;color:var(--muted);margin-top:8px}
+.conditions{padding:14px;display:grid;grid-template-rows:auto auto auto 1fr;gap:7px}.conditions h2{font-size:17px;margin:0;color:var(--muted);letter-spacing:.06em}.conditionTemps{display:grid;grid-template-columns:1fr 1fr;align-items:center}.tempBlock{text-align:center;padding:0 8px}.tempBlock+ .tempBlock{border-left:1px solid var(--line)}.tempValue{font-size:58px;font-weight:800;line-height:.95}.tempLabel{font-size:13px;color:#9ecbff;font-weight:750;letter-spacing:.06em;margin-top:5px}.cond{display:flex;align-items:center;justify-content:center;gap:12px;font-size:27px;font-weight:750;line-height:1}.condIcon{font-size:48px;line-height:1}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:center}.metric{background:var(--card2);border:1px solid #234c6d;border-radius:11px;padding:8px 10px;text-align:center}.metric b{display:block;font-size:25px;line-height:1.05}.metric span{font-size:13px;color:#8fc9ff}.updated{font-size:12px;color:var(--muted);align-self:end;margin-top:2px}
 .hours{padding:7px 10px}.hoursrow{height:100%;display:grid;grid-template-columns:repeat(8,1fr);gap:6px}.hour{text-align:center;border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:center}.hour:last-child{border:0}.hour .t{font-size:13px;color:var(--muted)}.hour .ico{font-size:24px;margin:4px}.hour .temp{font-size:20px;font-weight:700}.hour .rain{font-size:11px;color:#7fcaff;margin-top:3px}
 .days{display:block;padding:6px 10px}
 .daysrow{height:100%;display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
@@ -30,7 +30,7 @@ main{display:grid;grid-template-columns:1.55fr .75fr;gap:8px;min-height:0}
 nav{background:var(--card);border-radius:16px;padding:6px;display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 button{border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:10px;font-size:12px;font-weight:700}button.active{background:#17466a;border-color:#3d9ddd}
 .leaflet-control-attribution{font-size:9px!important}
-@media(max-width:900px){#app{padding:6px;gap:5px;grid-template-rows:70px minmax(245px,1fr) 104px 68px 46px}}
+@media(max-width:900px){#app{padding:6px;gap:5px;grid-template-rows:70px minmax(245px,1fr) 104px 68px 46px}.tempValue{font-size:50px}.cond{font-size:23px}.condIcon{font-size:40px}.metric b{font-size:22px}}
 </style>
 </head>
 <body>
@@ -38,13 +38,7 @@ button{border:1px solid var(--line);background:var(--card2);color:var(--text);bo
 <header>
   <div><div class="time" id="clock">--:--</div><div class="date" id="date"></div></div>
   <div class="place">SEAL BEACH</div>
-  <div class="status">
-    <div class="tempPair">
-      <div class="tempBlock"><div class="tempValue" id="bigtemp">--°</div><div class="tempLabel">CURRENT</div></div>
-      <div class="tempBlock"><div class="tempValue" id="feels">--°</div><div class="tempLabel">FEELS LIKE</div></div>
-    </div>
-    <div class="cond" id="condition">Loading weather…</div>
-  </div>
+  <div class="headerStatus" id="headerStatus">Weather station online</div>
 </header>
 
 <main>
@@ -57,6 +51,11 @@ button{border:1px solid var(--line);background:var(--card2);color:var(--text);bo
  </section>
  <section class="conditions">
    <h2>CURRENT CONDITIONS</h2>
+   <div class="conditionTemps">
+     <div class="tempBlock"><div class="tempValue" id="bigtemp">--°</div><div class="tempLabel">CURRENT</div></div>
+     <div class="tempBlock"><div class="tempValue" id="feels">--°</div><div class="tempLabel">FEELS LIKE</div></div>
+   </div>
+   <div class="cond" id="condition">Loading weather…</div>
    <div class="metrics">
      <div class="metric"><b id="rh">--%</b><span>Humidity</span></div>
      <div class="metric"><b id="wind">-- mph</b><span>Wind</span></div>
@@ -121,7 +120,7 @@ async function weather(){
  $('wind').textContent=Math.round(c.wind_speed_10m)+' mph';
  $('dew').textContent=Math.round(dewpointF(c.temperature_2m,c.relative_humidity_2m))+'°';
  $('cloud').textContent=Math.round(c.cloud_cover)+'%';
- $('updated').textContent='Weather updated '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+' • Open-Meteo';
+ const ut='Weather updated '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+' • Open-Meteo'; $('updated').textContent=ut; $('headerStatus').textContent=ut;
  const now=new Date(); let start=d.hourly.time.findIndex(t=>new Date(t)>=new Date(now.getFullYear(),now.getMonth(),now.getDate(),now.getHours()));
  if(start<0)start=0; const box=$('hoursrow'); box.innerHTML='';
  for(let j=0;j<8;j++){let i=start+j; let dt=new Date(d.hourly.time[i]); let el=document.createElement('div');el.className='hour';
